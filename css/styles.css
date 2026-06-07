@@ -62,12 +62,23 @@ h1, h2, h3 {
 
 .shell {
   width: 100%;
-  max-width: 940px;
+  max-width: 1500px;
   margin: 0 auto;
-  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem) 3rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.5rem) 3rem;
   display: flex;
   flex-direction: column;
-  gap: clamp(1.25rem, 3vw, 1.75rem);
+  gap: clamp(1.25rem, 2.5vw, 1.6rem);
+}
+
+/* Dashboard row: to-do + timer side by side on one level */
+.dash-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.25rem, 2.5vw, 1.6rem);
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .dash-row { grid-template-columns: 1fr; }
 }
 
 /* ---------- Buttons ---------- */
@@ -119,7 +130,7 @@ h1, h2, h3 {
 .hero-greeting { align-self: center; }
 
 .hero-greeting h1 {
-  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
   letter-spacing: -0.01em;
 }
 .wave { display: inline-block; }
