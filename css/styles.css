@@ -352,22 +352,34 @@ h1, h2, h3 {
 
 /* ---------- Pomodoro ---------- */
 .pomodoro { display: flex; flex-direction: column; }
-.pomo-setup { margin-top: 1rem; }
-.pomodoro.is-running .pomo-setup { display: none; }
+.pomo-setup { margin-top: 0.9rem; }
+.pomodoro.is-running .pomo-setup,
+.pomodoro.is-running .pomo-duration { display: none; }
 /* When running, the lone timer centers in the panel */
 .pomodoro.is-running .pomo-timer { margin-top: auto; margin-bottom: auto; }
-.setup-row {
+
+/* Full-width "decide how long" bar, sits above the clock */
+.pomo-duration {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 0.6rem;
-  margin-bottom: 0.7rem;
+  width: 100%;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+  margin-bottom: 0.9rem;
 }
-.setup-row > label { color: var(--ink-soft); font-weight: 600; font-size: 0.95rem; }
+.pomo-duration > label {
+  color: var(--ink-soft); font-weight: 700; font-size: 0.95rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.pomo-duration .btn { flex-shrink: 0; }
 .inline-inputs { display: inline-flex; align-items: center; gap: 0.3rem; }
 
-.pomo-setup input[type="number"] {
+.pomo-setup input[type="number"],
+.pomo-duration input[type="number"] {
   font-family: inherit;
   font-size: 1rem;
   font-weight: 700;
@@ -376,10 +388,11 @@ h1, h2, h3 {
   padding: 0.45rem 0.3rem;
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: var(--surface-soft);
+  background: var(--surface);
   color: var(--ink);
 }
-.pomo-setup input[type="number"]:focus {
+.pomo-setup input[type="number"]:focus,
+.pomo-duration input[type="number"]:focus {
   outline: none; border-color: var(--lilac);
   box-shadow: 0 0 0 4px rgba(185, 163, 227, 0.2);
 }
