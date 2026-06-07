@@ -40,97 +40,101 @@
       </section>
     </header>
 
-    <!-- ===== To-do + Timer (one level) ===== -->
-    <div class="dash-row">
-    <!-- ===== To-do ===== -->
-    <section class="panel todo" aria-label="To-do list">
-      <div class="panel-head">
-        <h2>Today's to-dos</h2>
-        <span class="counter" data-todo-counter></span>
-      </div>
-      <form class="todo-add" data-todo-form>
-        <input type="text" data-todo-input placeholder="What would you like to get done?" aria-label="New to-do" maxlength="120" />
-        <button type="submit" class="btn btn-soft" aria-label="Add to-do">Add</button>
-      </form>
-      <ul class="todo-list" data-todo-list></ul>
-      <p class="empty-note" data-todo-empty>Nothing here yet — add your first task above. 🌿</p>
-    </section>
+    <!-- ===== Dashboard ===== -->
+    <div class="dash-grid">
+      <!-- Left column: to-do + progress -->
+      <div class="dash-col">
+        <!-- To-do -->
+        <section class="panel todo" aria-label="To-do list">
+          <div class="panel-head">
+            <h2>Today's to-dos</h2>
+            <span class="counter" data-todo-counter></span>
+          </div>
+          <form class="todo-add" data-todo-form>
+            <input type="text" data-todo-input placeholder="What would you like to get done?" aria-label="New to-do" maxlength="120" />
+            <button type="submit" class="btn btn-soft" aria-label="Add to-do">Add</button>
+          </form>
+          <ul class="todo-list" data-todo-list></ul>
+          <p class="empty-note" data-todo-empty>Nothing here yet — add your first task above. 🌿</p>
+        </section>
 
-    <!-- ===== Pomodoro ===== -->
-    <section class="panel pomodoro" aria-label="Pomodoro timer">
-      <div class="panel-head">
-        <h2>Focus timer</h2>
+        <!-- Progress -->
+        <section class="panel progress" aria-label="Study progress">
+          <div class="panel-head">
+            <h2>Your progress</h2>
+            <button type="button" class="btn btn-ghost btn-tiny" data-reset-progress>Reset</button>
+          </div>
+          <div class="progress-body">
+            <div class="progress-ring-wrap">
+              <svg class="pring" viewBox="0 0 160 160" data-progress-ring>
+                <circle class="pring-track" cx="80" cy="80" r="68" />
+                <circle class="pring-fill" cx="80" cy="80" r="68" data-progress-fill />
+              </svg>
+              <div class="pring-center">
+                <span class="pring-pct" data-progress-pct>0%</span>
+              </div>
+            </div>
+            <div class="progress-stats">
+              <p class="progress-line"><strong data-studied>0m</strong> studied</p>
+              <p class="progress-line muted">of <strong data-planned>3h 0m</strong> planned</p>
+              <div class="progress-bar"><span data-progress-bar></span></div>
+              <p class="affirm" data-affirm>Let's begin whenever you're ready. 💜</p>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <!-- Setup -->
-      <div class="pomo-setup" data-pomo-setup>
-        <div class="setup-row">
-          <label>I'd like to study for
-            <span class="inline-inputs">
-              <input type="number" min="0" max="12" data-total-hours value="3" aria-label="Study hours" /> h
-              <input type="number" min="0" max="59" step="5" data-total-mins value="0" aria-label="Study minutes" /> m
-            </span>
-          </label>
-          <button type="button" class="btn btn-soft" data-suggest>Suggest a plan</button>
+      <!-- Right column: Pomodoro -->
+      <section class="panel pomodoro" data-pomodoro aria-label="Pomodoro timer">
+        <div class="panel-head">
+          <h2>Focus timer</h2>
+          <button type="button" class="btn btn-ghost btn-tiny" data-edit-plan hidden>Edit plan</button>
         </div>
 
-        <div class="setup-grid">
-          <label>Focus<br /><input type="number" min="5" max="90" data-focus-len value="25" /> min</label>
-          <label>Break<br /><input type="number" min="1" max="30" data-break-len value="5" /> min</label>
-          <label>Cycles<br /><input type="number" min="1" max="20" data-cycles value="3" /></label>
+        <!-- Setup (hidden once a session starts) -->
+        <div class="pomo-setup" data-pomo-setup>
+          <div class="setup-row">
+            <label>Study for
+              <span class="inline-inputs">
+                <input type="number" min="0" max="12" data-total-hours value="3" aria-label="Study hours" /> h
+                <input type="number" min="0" max="59" step="5" data-total-mins value="0" aria-label="Study minutes" /> m
+              </span>
+            </label>
+            <button type="button" class="btn btn-soft btn-tiny" data-suggest>Suggest</button>
+          </div>
+
+          <div class="setup-grid">
+            <label>Focus<input type="number" min="5" max="90" data-focus-len value="25" /></label>
+            <label>Break<input type="number" min="1" max="30" data-break-len value="5" /></label>
+            <label>Cycles<input type="number" min="1" max="20" data-cycles value="3" /></label>
+          </div>
+
+          <div class="schedule" data-schedule aria-label="Session schedule"></div>
+          <p class="schedule-summary" data-schedule-summary></p>
         </div>
 
-        <div class="schedule" data-schedule aria-label="Session schedule"></div>
-        <p class="schedule-summary" data-schedule-summary></p>
-      </div>
-
-      <!-- Timer -->
-      <div class="pomo-timer">
-        <div class="ring-wrap">
-          <svg class="ring" viewBox="0 0 220 220" data-ring>
-            <circle class="ring-track" cx="110" cy="110" r="100" />
-            <circle class="ring-progress" cx="110" cy="110" r="100" data-ring-progress />
-          </svg>
-          <div class="ring-center">
-            <span class="phase-label" data-phase>Focus</span>
-            <span class="ring-time" data-ring-time>25:00</span>
-            <span class="cycle-label" data-cycle-label>Cycle 1 of 3</span>
+        <!-- Timer -->
+        <div class="pomo-timer">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 220 220" data-ring>
+              <circle class="ring-track" cx="110" cy="110" r="100" />
+              <circle class="ring-progress" cx="110" cy="110" r="100" data-ring-progress />
+            </svg>
+            <div class="ring-center">
+              <span class="phase-label" data-phase>Focus</span>
+              <span class="ring-time" data-ring-time>25:00</span>
+              <span class="cycle-label" data-cycle-label>Cycle 1 of 3</span>
+            </div>
+          </div>
+          <div class="timer-controls">
+            <button type="button" class="btn btn-primary" data-start>Start</button>
+            <button type="button" class="btn btn-soft" data-pause hidden>Pause</button>
+            <button type="button" class="btn btn-ghost" data-reset>Reset</button>
+            <button type="button" class="btn btn-ghost" data-skip>Skip</button>
           </div>
         </div>
-        <div class="timer-controls">
-          <button type="button" class="btn btn-primary" data-start>Start</button>
-          <button type="button" class="btn btn-soft" data-pause hidden>Pause</button>
-          <button type="button" class="btn btn-ghost" data-reset>Reset</button>
-          <button type="button" class="btn btn-ghost" data-skip>Skip phase</button>
-        </div>
-      </div>
-    </section>
-    </div><!-- /.dash-row -->
-
-    <!-- ===== Progress ===== -->
-    <section class="panel progress" aria-label="Study progress">
-      <div class="panel-head">
-        <h2>Your progress</h2>
-        <button type="button" class="btn btn-ghost btn-tiny" data-reset-progress>Reset</button>
-      </div>
-      <div class="progress-body">
-        <div class="progress-ring-wrap">
-          <svg class="pring" viewBox="0 0 160 160" data-progress-ring>
-            <circle class="pring-track" cx="80" cy="80" r="68" />
-            <circle class="pring-fill" cx="80" cy="80" r="68" data-progress-fill />
-          </svg>
-          <div class="pring-center">
-            <span class="pring-pct" data-progress-pct>0%</span>
-          </div>
-        </div>
-        <div class="progress-stats">
-          <p class="progress-line"><strong data-studied>0m</strong> studied</p>
-          <p class="progress-line muted">of <strong data-planned>3h 0m</strong> planned</p>
-          <div class="progress-bar"><span data-progress-bar></span></div>
-          <p class="affirm" data-affirm>Let's begin whenever you're ready. 💜</p>
-        </div>
-      </div>
-    </section>
+      </section>
+    </div><!-- /.dash-grid -->
 
     <footer class="foot">
       <p>Made with care for focused study · <span data-year></span></p>

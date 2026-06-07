@@ -295,7 +295,16 @@
   var cycleLabel = $("[data-cycle-label]");
   var startBtn = $("[data-start]");
   var pauseBtn = $("[data-pause]");
+  var pomoSection = $("[data-pomodoro]");
+  var editPlanBtn = $("[data-edit-plan]");
   var RING_LEN = 2 * Math.PI * 100;
+
+  // Show/hide the plan-editing controls. They collapse while a session
+  // is active (from Start until Reset or completion) to keep the timer compact.
+  function setEditing(active) {
+    pomoSection.classList.toggle("is-running", active);
+    editPlanBtn.hidden = !active;
+  }
   ring.style.strokeDasharray = RING_LEN;
 
   var phases = [];
@@ -330,6 +339,7 @@
 
   function resetTimer() {
     stop();
+    setEditing(false);
     phases = buildPhases();
     idx = 0;
     remaining = phases[0].secs;
@@ -350,6 +360,7 @@
     if (!phases.length) resetTimer();
     if (idx >= phases.length) { resetTimer(); }
     running = true;
+    setEditing(true);
     lastTick = Date.now();
     startBtn.hidden = true;
     pauseBtn.hidden = false;
@@ -382,6 +393,7 @@
       remaining = 0;
       paint();
       stop();
+      setEditing(false);
       celebrate();
       idx = phases.length; // mark finished
       return;
@@ -418,6 +430,7 @@
   startBtn.addEventListener("click", start);
   pauseBtn.addEventListener("click", stop);
   $("[data-reset]").addEventListener("click", function () { readSettings(); resetTimer(); });
+  editPlanBtn.addEventListener("click", function () { resetTimer(); });
   $("[data-skip]").addEventListener("click", function () {
     if (!phases.length) resetTimer();
     if (idx < phases.length - 1) { idx++; remaining = phases[idx].secs; paint(); }
