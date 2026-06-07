@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Rino's calendar — month, week, and day views with events, multiple calendars, recurrence, and search." />
+  <title>Calendar · Hello, Rino!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/calendar.css" />
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"></div>
+
+  <div class="cal-app">
+    <!-- ===== Sidebar ===== -->
+    <aside class="cal-sidebar" data-sidebar>
+      <a class="cal-back" href="index.html">← Study</a>
+      <h1 class="cal-brand">Calendar</h1>
+
+      <div class="mini-cal" data-mini></div>
+
+      <div class="cal-list-head">
+        <h2>My Calendars</h2>
+        <button type="button" class="icon-btn" data-add-calendar aria-label="Add calendar">+</button>
+      </div>
+      <ul class="cal-list" data-cal-list></ul>
+    </aside>
+
+    <!-- ===== Main ===== -->
+    <main class="cal-main">
+      <header class="cal-toolbar">
+        <div class="tb-left">
+          <button type="button" class="icon-btn" data-menu aria-label="Toggle sidebar">☰</button>
+          <button type="button" class="btn btn-soft" data-today>Today</button>
+          <div class="nav-arrows">
+            <button type="button" class="icon-btn" data-prev aria-label="Previous">‹</button>
+            <button type="button" class="icon-btn" data-next aria-label="Next">›</button>
+          </div>
+          <h2 class="cal-title" data-title>—</h2>
+        </div>
+
+        <div class="tb-right">
+          <div class="search-wrap">
+            <input type="search" placeholder="Search events" data-search aria-label="Search events" />
+            <ul class="search-results" data-search-results hidden></ul>
+          </div>
+          <div class="view-switch" role="tablist" aria-label="Calendar view">
+            <button type="button" data-view="day" role="tab">Day</button>
+            <button type="button" data-view="week" role="tab">Week</button>
+            <button type="button" data-view="month" role="tab" class="active">Month</button>
+          </div>
+          <button type="button" class="btn btn-primary" data-new-event>+ New Event</button>
+        </div>
+      </header>
+
+      <section class="cal-surface" data-surface aria-live="polite"></section>
+    </main>
+  </div>
+
+  <!-- ===== Event editor dialog ===== -->
+  <div class="modal-backdrop" data-modal hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="evt-title-label">
+      <header class="modal-head">
+        <h3 id="evt-title-label">Event</h3>
+        <button type="button" class="icon-btn" data-modal-close aria-label="Close">×</button>
+      </header>
+
+      <form class="evt-form" data-evt-form>
+        <input type="hidden" data-evt-id />
+        <div class="field">
+          <input type="text" data-evt-title placeholder="Title" aria-label="Event title" maxlength="140" required />
+        </div>
+
+        <div class="field row">
+          <label class="check"><input type="checkbox" data-evt-allday /> All-day</label>
+          <select data-evt-calendar aria-label="Calendar"></select>
+        </div>
+
+        <div class="field grid2">
+          <label>Starts
+            <span class="dt">
+              <input type="date" data-evt-start-date />
+              <input type="time" data-evt-start-time />
+            </span>
+          </label>
+          <label>Ends
+            <span class="dt">
+              <input type="date" data-evt-end-date />
+              <input type="time" data-evt-end-time />
+            </span>
+          </label>
+        </div>
+
+        <div class="field">
+          <label>Repeat
+            <select data-evt-repeat>
+              <option value="none">Never</option>
+              <option value="daily">Every day</option>
+              <option value="weekly">Every week</option>
+              <option value="monthly">Every month</option>
+              <option value="yearly">Every year</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="field">
+          <input type="text" data-evt-location placeholder="Location" aria-label="Location" />
+        </div>
+        <div class="field">
+          <textarea data-evt-notes placeholder="Notes" rows="3" aria-label="Notes"></textarea>
+        </div>
+
+        <p class="form-error" data-evt-error role="alert"></p>
+
+        <footer class="modal-foot">
+          <button type="button" class="btn btn-ghost danger" data-evt-delete hidden>Delete</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn btn-ghost" data-modal-cancel>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/calendar.js"></script>
+</body>
+</html>

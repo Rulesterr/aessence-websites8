@@ -128,6 +128,19 @@ h1, h2, h3 {
   color: var(--ink-soft);
   font-size: 1.1rem;
 }
+.cal-link {
+  display: inline-block;
+  margin-top: 0.9rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--lilac-deeper);
+  font-weight: 700;
+  font-size: 0.92rem;
+  transition: transform 0.18s var(--ease), background 0.2s var(--ease);
+}
+.cal-link:hover { transform: translateY(-2px); background: #e6daf9; }
 
 /* ---------- Weather card ---------- */
 .weather-card {

@@ -27,15 +27,35 @@ lilac theme for a focused, encouraging study experience.
 - **Accessible & comfortable** — keyboard-operable, AA-minded contrast,
   `prefers-reduced-motion` support.
 
+## Calendar 📅
+
+A self-contained, Apple-Calendar-style calendar lives at **`calendar.html`**
+(linked from the study page). No external API or backend — everything is stored
+in `localStorage`.
+
+- **Month / Week / Day** views with a view switcher and Today / prev / next nav.
+- **Create, edit, and delete events** via a dialog — title, all-day or timed,
+  start/end, location, and notes.
+- **Multiple color-coded calendars** (Personal, Study, Exams by default); add
+  your own, and toggle each one's visibility.
+- **Recurring events** — daily, weekly, monthly, or yearly, expanded across views.
+- **Search** events by title, location, or notes.
+- **Mini month calendar** in the sidebar for quick navigation.
+- Overlapping events are laid out side-by-side; a live "now" line marks the
+  current time in Week/Day views.
+
 ## Structure
 
 ```
 .
-├── index.html          # The single page
+├── index.html           # Study companion (the one-pager)
+├── calendar.html        # Full calendar app
 ├── css/
-│   └── styles.css       # Lavender theme; design tokens via CSS variables
+│   ├── styles.css        # Lavender theme + study page; design tokens
+│   └── calendar.css      # Calendar layout & views
 └── js/
-    └── app.js           # Clock, weather, to-dos, Pomodoro, progress
+    ├── app.js            # Clock, weather, to-dos, Pomodoro, progress
+    └── calendar.js       # Calendar: views, events, recurrence, search
 ```
 
 ## Running locally
