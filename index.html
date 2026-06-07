@@ -3,81 +3,136 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Aessence — pure botanical essentials crafted for everyday calm and clarity." />
-  <title>Aessence — Pure Botanical Essentials</title>
+  <meta name="description" content="Rino's study companion — Tokyo time & weather, a to-do list, a customizable Pomodoro timer, and your study progress." />
+  <title>Hello, Rino! · Study Companion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <header class="site-header" data-header>
-    <div class="container nav-wrap">
-      <a class="brand" href="index.html">Aessence</a>
-      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" data-nav-toggle>
-        <span></span><span></span><span></span>
-      </button>
-      <nav class="nav" data-nav>
-        <a href="index.html" class="active">Home</a>
-        <a href="about.html">About</a>
-        <a href="products.html">Products</a>
-        <a href="contact.html">Contact</a>
-      </nav>
-    </div>
-  </header>
+  <div class="aurora" aria-hidden="true"></div>
 
-  <main>
-    <section class="hero">
-      <div class="container hero-inner">
-        <p class="eyebrow">Botanical care, simplified</p>
-        <h1>Pure essentials for everyday calm.</h1>
-        <p class="lead">Thoughtfully sourced botanicals, blended in small batches. No noise, no excess — just what your ritual needs.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="products.html">Explore products</a>
-          <a class="btn btn-ghost" href="about.html">Our story</a>
+  <main class="shell">
+    <!-- ===== Header ===== -->
+    <header class="hero">
+      <div class="hero-greeting">
+        <h1>Hello, Rino! <span class="wave" aria-hidden="true">🌙</span></h1>
+        <p class="subtitle" data-greeting-sub>Ready to focus?</p>
+      </div>
+
+      <section class="weather-card" data-weather aria-label="Tokyo time and weather">
+        <div class="weather-time">
+          <span class="weather-loc">Tokyo, Japan</span>
+          <span class="clock" data-clock>--:--:--</span>
+          <span class="date" data-date>—</span>
+        </div>
+        <div class="weather-now">
+          <span class="weather-icon" data-weather-icon aria-hidden="true">…</span>
+          <div class="weather-readout">
+            <span class="temp" data-temp>—</span>
+            <span class="cond" data-cond>Loading weather…</span>
+            <span class="humidity" data-humidity></span>
+          </div>
+        </div>
+        <ul class="forecast" data-forecast aria-label="3-day forecast"></ul>
+      </section>
+    </header>
+
+    <!-- ===== To-do ===== -->
+    <section class="panel todo" aria-label="To-do list">
+      <div class="panel-head">
+        <h2>Today's to-dos</h2>
+        <span class="counter" data-todo-counter></span>
+      </div>
+      <form class="todo-add" data-todo-form>
+        <input type="text" data-todo-input placeholder="What would you like to get done?" aria-label="New to-do" maxlength="120" />
+        <button type="submit" class="btn btn-soft" aria-label="Add to-do">Add</button>
+      </form>
+      <ul class="todo-list" data-todo-list></ul>
+      <p class="empty-note" data-todo-empty>Nothing here yet — add your first task above. 🌿</p>
+    </section>
+
+    <!-- ===== Pomodoro ===== -->
+    <section class="panel pomodoro" aria-label="Pomodoro timer">
+      <div class="panel-head">
+        <h2>Focus timer</h2>
+      </div>
+
+      <!-- Setup -->
+      <div class="pomo-setup" data-pomo-setup>
+        <div class="setup-row">
+          <label>I'd like to study for
+            <span class="inline-inputs">
+              <input type="number" min="0" max="12" data-total-hours value="3" aria-label="Study hours" /> h
+              <input type="number" min="0" max="59" step="5" data-total-mins value="0" aria-label="Study minutes" /> m
+            </span>
+          </label>
+          <button type="button" class="btn btn-soft" data-suggest>Suggest a plan</button>
+        </div>
+
+        <div class="setup-grid">
+          <label>Focus<br /><input type="number" min="5" max="90" data-focus-len value="25" /> min</label>
+          <label>Break<br /><input type="number" min="1" max="30" data-break-len value="5" /> min</label>
+          <label>Cycles<br /><input type="number" min="1" max="20" data-cycles value="3" /></label>
+        </div>
+
+        <div class="schedule" data-schedule aria-label="Session schedule"></div>
+        <p class="schedule-summary" data-schedule-summary></p>
+      </div>
+
+      <!-- Timer -->
+      <div class="pomo-timer">
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 220 220" data-ring>
+            <circle class="ring-track" cx="110" cy="110" r="100" />
+            <circle class="ring-progress" cx="110" cy="110" r="100" data-ring-progress />
+          </svg>
+          <div class="ring-center">
+            <span class="phase-label" data-phase>Focus</span>
+            <span class="ring-time" data-ring-time>25:00</span>
+            <span class="cycle-label" data-cycle-label>Cycle 1 of 3</span>
+          </div>
+        </div>
+        <div class="timer-controls">
+          <button type="button" class="btn btn-primary" data-start>Start</button>
+          <button type="button" class="btn btn-soft" data-pause hidden>Pause</button>
+          <button type="button" class="btn btn-ghost" data-reset>Reset</button>
+          <button type="button" class="btn btn-ghost" data-skip>Skip phase</button>
         </div>
       </div>
     </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="feature-grid">
-          <article class="feature">
-            <h3>Single-origin</h3>
-            <p>Every ingredient is traceable to its source — grown, harvested, and pressed with intention.</p>
-          </article>
-          <article class="feature">
-            <h3>Small batch</h3>
-            <p>Blended in limited runs so each formula stays fresh, potent, and true to the season.</p>
-          </article>
-          <article class="feature">
-            <h3>Nothing hidden</h3>
-            <p>Full ingredient transparency on every label. What you read is exactly what's inside.</p>
-          </article>
+    <!-- ===== Progress ===== -->
+    <section class="panel progress" aria-label="Study progress">
+      <div class="panel-head">
+        <h2>Your progress</h2>
+        <button type="button" class="btn btn-ghost btn-tiny" data-reset-progress>Reset</button>
+      </div>
+      <div class="progress-body">
+        <div class="progress-ring-wrap">
+          <svg class="pring" viewBox="0 0 160 160" data-progress-ring>
+            <circle class="pring-track" cx="80" cy="80" r="68" />
+            <circle class="pring-fill" cx="80" cy="80" r="68" data-progress-fill />
+          </svg>
+          <div class="pring-center">
+            <span class="pring-pct" data-progress-pct>0%</span>
+          </div>
+        </div>
+        <div class="progress-stats">
+          <p class="progress-line"><strong data-studied>0m</strong> studied</p>
+          <p class="progress-line muted">of <strong data-planned>3h 0m</strong> planned</p>
+          <div class="progress-bar"><span data-progress-bar></span></div>
+          <p class="affirm" data-affirm>Let's begin whenever you're ready. 💜</p>
         </div>
       </div>
     </section>
 
-    <section class="section section-alt">
-      <div class="container split">
-        <div class="split-text">
-          <p class="eyebrow">The ritual</p>
-          <h2>Designed to slow you down.</h2>
-          <p>Aessence began with a simple question: what if daily care felt less like a task and more like a pause? Each product is built around that pause — a moment to breathe before the day takes over.</p>
-          <a class="link-arrow" href="about.html">Read our story →</a>
-        </div>
-        <div class="split-media" aria-hidden="true"></div>
-      </div>
-    </section>
+    <footer class="foot">
+      <p>Made with care for focused study · <span data-year></span></p>
+    </footer>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <span class="brand">Aessence</span>
-      <p>&copy; <span data-year></span> Aessence. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <script src="js/main.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

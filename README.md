@@ -1,56 +1,64 @@
-# Aessence
+# Rino's Study Companion 💜
 
-A clean, responsive **static website** for Aessence — a fictional botanical essentials brand. Built with plain HTML, CSS, and vanilla JavaScript. No build step, no dependencies.
+A calm, single-page **study aid** built with plain HTML, CSS, and vanilla
+JavaScript — no build step, no dependencies. Designed around a soft lavender &
+lilac theme for a focused, encouraging study experience.
 
-## Pages
+> Greeting: **Hello, Rino!**
 
-| Page | File | Description |
-|------|------|-------------|
-| Home | `index.html` | Hero, brand pillars, and story teaser |
-| About | `about.html` | Brand story and values |
-| Products | `products.html` | Collection grid (rendered from data in `js/main.js`) |
-| Contact | `contact.html` | Validated contact form + studio details |
+## Features
+
+- **Tokyo clock & date** — live, ticking every second (`Asia/Tokyo`), with a
+  time-aware greeting subtitle.
+- **Live weather** — current temperature, condition, and humidity for Tokyo,
+  plus a 3-day forecast. Data from the free, key-less
+  [Open-Meteo](https://open-meteo.com/) API (refreshes every 10 minutes).
+- **To-do list** — add, check off, and delete tasks. Sits right under the title.
+- **Customizable Pomodoro** — enter the total time you'd like to study, get a
+  **suggested schedule**, then freely tweak focus length, break length, and
+  number of cycles. A visual timeline previews the session.
+- **Focus timer** — a large circular countdown that runs the full focus/break
+  sequence, shifting color between focus (lilac) and break (mint), with a gentle
+  chime and a little celebration when you finish.
+- **Progress graph** — a ring + bar comparing time **studied** against your
+  **planned** total, with encouraging affirmations along the way.
+- **Persistence** — to-dos, settings, and accumulated study time are saved to
+  `localStorage`, so they survive refreshes and return visits.
+- **Accessible & comfortable** — keyboard-operable, AA-minded contrast,
+  `prefers-reduced-motion` support.
 
 ## Structure
 
 ```
 .
-├── index.html
-├── about.html
-├── products.html
-├── contact.html
+├── index.html          # The single page
 ├── css/
-│   └── styles.css      # All styling, design tokens via CSS variables
+│   └── styles.css       # Lavender theme; design tokens via CSS variables
 └── js/
-    └── main.js         # Nav toggle, scroll reveal, product list, form validation
+    └── app.js           # Clock, weather, to-dos, Pomodoro, progress
 ```
 
 ## Running locally
 
-It's a static site, so just open `index.html` in a browser. For nav/asset
-paths to behave consistently, serving over HTTP is recommended:
+It's a static site. Serving over HTTP is recommended (the weather `fetch`
+behaves best over `http://` rather than `file://`):
 
 ```bash
 # Python 3
 python3 -m http.server 8000
-
 # or Node
 npx serve .
 ```
 
-Then visit <http://localhost:8000>.
+Then open <http://localhost:8000>. **Network access is required** for live
+weather and Google Fonts; everything else works offline.
 
 ## Customizing
 
-- **Colors & spacing** — edit the CSS variables in `:root` at the top of `css/styles.css`.
-- **Products** — edit the `products` array in `js/main.js`.
-- **Copy** — text lives directly in the HTML files.
-
-## Notes
-
-- The contact form is client-side only; wire `js/main.js` up to a backend or
-  form service (Formspree, Netlify Forms, etc.) to receive submissions.
-- Fonts are loaded from Google Fonts (Cormorant Garamond + Inter).
+- **Theme** — edit the CSS variables in `:root` at the top of `css/styles.css`.
+- **Location** — change the `latitude`/`longitude` in `loadWeather()` and the
+  `timeZone` in `js/app.js` to study from somewhere else.
+- **Defaults** — adjust the default Pomodoro settings in `loadState()`.
 
 ## License
 
