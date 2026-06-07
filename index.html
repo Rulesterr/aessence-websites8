@@ -19,7 +19,6 @@
       <div class="hero-greeting">
         <h1>Hello, Rino! <span class="wave" aria-hidden="true">🌙</span></h1>
         <p class="subtitle" data-greeting-sub>Ready to focus?</p>
-        <a class="cal-link" href="calendar.html">📅 Open Calendar</a>
       </div>
 
       <section class="weather-card" data-weather aria-label="Tokyo time and weather">
@@ -37,6 +36,16 @@
           </div>
         </div>
         <ul class="forecast" data-forecast aria-label="3-day forecast"></ul>
+      </section>
+
+      <section class="cal-card" aria-label="Calendar">
+        <div class="cc-head">
+          <button type="button" data-cc-prev aria-label="Previous month">‹</button>
+          <strong data-cc-title>—</strong>
+          <button type="button" data-cc-next aria-label="Next month">›</button>
+        </div>
+        <div class="cc-grid" data-cc-grid></div>
+        <a class="cc-open" href="calendar.html">Open full calendar →</a>
       </section>
     </header>
 

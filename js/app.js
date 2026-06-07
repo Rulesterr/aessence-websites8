@@ -505,4 +505,108 @@
 
   // persist on leave
   window.addEventListener("beforeunload", saveNow);
+
+  /* ============================================================
+     Mini calendar card — reads the full calendar's events
+     (stored by calendar.js under "rino.calendar.v1") and shows a
+     month with today highlighted and dots on days that have events.
+     Clicking a day opens the full calendar on that date.
+     ============================================================ */
+  (function miniCal() {
+    var grid = $("[data-cc-grid]");
+    if (!grid) return;
+    var titleEl = $("[data-cc-title]");
+    var CAL_STORE = "rino.calendar.v1";
+    var DOWS = ["S", "M", "T", "W", "T", "F", "S"];
+    var MONTHS = ["January", "February", "March", "April", "May", "June", "July",
+      "August", "September", "October", "November", "December"];
+    var shown = new Date(); shown.setDate(1); shown.setHours(0, 0, 0, 0);
+
+    function sod(d) { var x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+    function addD(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+    function addM(d, n) { var x = new Date(d); x.setDate(1); x.setMonth(x.getMonth() + n); return x; }
+    function same(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+    function p2(n) { return n < 10 ? "0" + n : "" + n; }
+    function key(d) { return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate(); }
+
+    function calData() {
+      try { var d = JSON.parse(localStorage.getItem(CAL_STORE)); if (d && d.events) return d; } catch (e) {}
+      return { calendars: [], events: [], hidden: [] };
+    }
+    function colorOf(data, id) {
+      var c = (data.calendars || []).filter(function (x) { return x.id === id; })[0];
+      return c ? c.color : "#8c6fd1";
+    }
+
+    function mark(map, d, col) {
+      var k = key(d);
+      if (!map[k]) map[k] = [];
+      if (map[k].length < 3 && map[k].indexOf(col) === -1) map[k].push(col);
+    }
+    function markRange(map, start, end, col, rs, re) {
+      var d = sod(new Date(Math.max(start.getTime(), rs.getTime())));
+      var guard = 0;
+      while (d < end && d < re && guard < 70) {
+        if (d >= rs) mark(map, d, col);
+        d = addD(d, 1); guard++;
+      }
+    }
+    function dayColors(data, rs, re) {
+      var map = {};
+      (data.events || []).forEach(function (ev) {
+        if (data.hidden && data.hidden.indexOf(ev.calendarId) !== -1) return;
+        var col = colorOf(data, ev.calendarId);
+        var s0 = new Date(ev.start), e0 = new Date(ev.end), dur = e0 - s0;
+        var rep = ev.repeat || "none";
+        if (rep === "none") { markRange(map, s0, e0, col, rs, re); return; }
+        var cur = new Date(s0), i = 0;
+        while (cur < re && i < 800) {
+          var oe = new Date(cur.getTime() + dur);
+          if (oe > rs) markRange(map, cur, oe, col, rs, re);
+          if (rep === "daily") cur = addD(cur, 1);
+          else if (rep === "weekly") cur = addD(cur, 7);
+          else if (rep === "monthly") cur = addM(cur, 1);
+          else if (rep === "yearly") cur = addM(cur, 12);
+          else break;
+          i++;
+        }
+      });
+      return map;
+    }
+
+    function render() {
+      titleEl.textContent = MONTHS[shown.getMonth()] + " " + shown.getFullYear();
+      var first = new Date(shown.getFullYear(), shown.getMonth(), 1);
+      var gs = addD(sod(first), -first.getDay());
+      var rs = gs, re = addD(gs, 42);
+      var colors = dayColors(calData(), rs, re);
+      var today = new Date();
+      var html = "";
+      DOWS.forEach(function (d) { html += '<span class="dow">' + d + "</span>"; });
+      for (var i = 0; i < 42; i++) {
+        var day = addD(gs, i);
+        var cls = "cc-day";
+        if (day.getMonth() !== shown.getMonth()) cls += " muted";
+        if (same(day, today)) cls += " today";
+        var dots = (colors[key(day)] || []).map(function (c) {
+          return '<span class="cc-dot" style="background:' + c + '"></span>';
+        }).join("");
+        html += '<div class="' + cls + '" data-cc-day="' + day.getTime() + '"><span>' + day.getDate() +
+          '</span><span class="cc-dots">' + dots + "</span></div>";
+      }
+      grid.innerHTML = html;
+    }
+
+    $("[data-cc-prev]").addEventListener("click", function () { shown = addM(shown, -1); render(); });
+    $("[data-cc-next]").addEventListener("click", function () { shown = addM(shown, 1); render(); });
+    grid.addEventListener("click", function (e) {
+      var c = e.target.closest("[data-cc-day]");
+      if (!c) return;
+      var d = new Date(+c.dataset.ccDay);
+      window.location.href = "calendar.html#" + d.getFullYear() + "-" + p2(d.getMonth() + 1) + "-" + p2(d.getDate());
+    });
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) render(); });
+
+    render();
+  })();
 })();

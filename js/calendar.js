@@ -587,6 +587,16 @@
   });
 
   /* ---------- Init ---------- */
+  // Honor a #YYYY-MM-DD hash (e.g. from the home page mini calendar):
+  // jump straight to that day.
+  (function applyHash() {
+    var m = /^#(\d{4})-(\d{2})-(\d{2})$/.exec(location.hash || "");
+    if (!m) return;
+    cursor = startOfDay(new Date(+m[1], +m[2] - 1, +m[3]));
+    miniCursor = new Date(cursor);
+    view = "day";
+  })();
+
   render();
   // keep the "now" line and today highlight fresh
   setInterval(function () { if (view !== "month") render(); }, 60000);

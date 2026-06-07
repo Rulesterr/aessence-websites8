@@ -29,9 +29,11 @@ lilac theme for a focused, encouraging study experience.
 
 ## Calendar 📅
 
-A self-contained, Apple-Calendar-style calendar lives at **`calendar.html`**
-(linked from the study page). No external API or backend — everything is stored
-in `localStorage`.
+A self-contained, Apple-Calendar-style calendar lives at **`calendar.html`**.
+The study page's header shows a **mini-month card** next to the Tokyo card
+(today highlighted, dots on days with events); clicking a day opens the full
+calendar on that date via a `#YYYY-MM-DD` hash. No external API or backend —
+everything is stored in `localStorage`.
 
 - **Month / Week / Day** views with a view switcher and Today / prev / next nav.
 - **Create, edit, and delete events** via a dialog — title, all-day or timed,
