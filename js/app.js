@@ -7,7 +7,140 @@
   "use strict";
 
   var $ = function (sel, ctx) { return (ctx || document).querySelector(sel); };
+  var $$ = function (sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); };
   var STORE = "rino.study.v1";
+
+  /* ============================================================
+     i18n — English / Japanese
+     ============================================================ */
+  var LANG_STORE = "rino.lang";
+  var lang = (function () {
+    try { return localStorage.getItem(LANG_STORE) === "ja" ? "ja" : "en"; } catch (e) { return "en"; }
+  })();
+
+  var DICT = {
+    en: {
+      greeting: "Hello, Rino!",
+      tokyo: "Tokyo, Japan",
+      openCal: "Open full calendar →",
+      todos: "Today's to-dos",
+      add: "Add",
+      todoPlaceholder: "What would you like to get done?",
+      todoEmpty: "Nothing here yet — add your first task above. 🌿",
+      progressTitle: "Your progress",
+      reset: "Reset",
+      focusTimer: "Focus timer",
+      editPlan: "Edit plan",
+      studyFor: "Study for",
+      enter: "Enter",
+      hUnit: "h", mUnit: "m",
+      focus: "Focus", breakLabel: "Break", cyclesLabel: "Cycles",
+      start: "Start", pause: "Pause", skip: "Skip",
+      footer: "Made with care for focused study",
+      weatherLoading: "Loading weather…",
+      weatherUnavailable: "Weather unavailable right now.",
+      humidityLabel: "Humidity",
+      subs: [
+        "Burning the midnight oil — be gentle with yourself.",
+        "Good morning — a fresh start awaits.",
+        "Good afternoon — let's make it count.",
+        "Good evening — ready to focus?",
+        "Winding down — one more focused stretch?",
+      ],
+      cycleOf: function (a, b) { return "Cycle " + a + " of " + b; },
+      leftOf: function (a, b) { return a + " left of " + b; },
+      scheduleSummary: function (c, f, b, study, total) {
+        return c + " × " + f + "m focus + " + b + "m breaks · " + study + " studying, " + total + " total.";
+      },
+      studiedLine: function (v) { return "<strong>" + v + "</strong> studied"; },
+      plannedLine: function (v) { return "of <strong>" + v + "</strong> planned"; },
+      affirms: [
+        "Let's begin whenever you're ready. 💜",
+        "You're off to a lovely start. Keep going! 🌱",
+        "Over a third done — you've got this. 🌿",
+        "So close now — finish strong. 🌸",
+        "Goal reached — wonderful work today! 🎉💜",
+      ],
+      sessionDone: "Session complete — take a well-earned breath. 🎉",
+    },
+    ja: {
+      greeting: "こんにちは、Rino！",
+      tokyo: "東京、日本",
+      openCal: "カレンダーを開く →",
+      todos: "今日のやること",
+      add: "追加",
+      todoPlaceholder: "何を終わらせたいですか？",
+      todoEmpty: "まだありません — 上から最初のタスクを追加しましょう。🌿",
+      progressTitle: "学習の進捗",
+      reset: "リセット",
+      focusTimer: "集中タイマー",
+      editPlan: "プラン編集",
+      studyFor: "勉強時間",
+      enter: "決定",
+      hUnit: "時間", mUnit: "分",
+      focus: "集中", breakLabel: "休憩", cyclesLabel: "サイクル",
+      start: "開始", pause: "一時停止", skip: "スキップ",
+      footer: "集中して学べるよう、心を込めて",
+      weatherLoading: "天気を読み込み中…",
+      weatherUnavailable: "現在、天気を取得できません。",
+      humidityLabel: "湿度",
+      subs: [
+        "夜更かし中 — 無理せずいきましょう。",
+        "おはよう — 新しい一日の始まりです。",
+        "こんにちは — 今日も頑張りましょう。",
+        "こんばんは — 集中する準備はいい？",
+        "そろそろ終わり — もうひと頑張りする？",
+      ],
+      cycleOf: function (a, b) { return "サイクル " + a + " / " + b; },
+      leftOf: function (a, b) { return "残り " + a + " / " + b; },
+      scheduleSummary: function (c, f, b, study, total) {
+        return c + "×" + f + "分集中 ＋ " + b + "分休憩 · 勉強" + study + "、合計" + total + "。";
+      },
+      studiedLine: function (v) { return "<strong>" + v + "</strong> 勉強しました"; },
+      plannedLine: function (v) { return "目標 <strong>" + v + "</strong>"; },
+      affirms: [
+        "準備ができたら始めましょう。💜",
+        "良いスタートです。その調子！🌱",
+        "3分の1を達成 — いい調子です。🌿",
+        "あと少し — 最後まで頑張って。🌸",
+        "目標達成 — 今日もよく頑張りました！🎉💜",
+      ],
+      sessionDone: "セッション完了 — ひと息つきましょう。🎉",
+    },
+  };
+  function L() { return DICT[lang]; }
+  var miniCalRender = null; // set by the mini-calendar module; re-rendered on lang change
+
+  function applyStaticI18n() {
+    var d = L();
+    $$("[data-i18n]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n");
+      if (typeof d[k] === "string") el.textContent = d[k];
+    });
+    $$("[data-i18n-ph]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n-ph");
+      if (typeof d[k] === "string") el.placeholder = d[k];
+    });
+  }
+  function updateLangToggle() {
+    $$("[data-lang-switch] button").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-lang") === lang);
+    });
+  }
+  function applyLang(newLang) {
+    lang = newLang === "ja" ? "ja" : "en";
+    try { localStorage.setItem(LANG_STORE, lang); } catch (e) {}
+    document.documentElement.lang = lang;
+    applyStaticI18n();
+    updateLangToggle();
+    tickClock();
+    renderTodos();
+    renderSchedule();
+    if (phases && phases.length) paint();
+    renderProgress();
+    refreshWeatherText();
+    if (miniCalRender) miniCalRender();
+  }
 
   /* ---------- Persistence ---------- */
   var state = loadState();
@@ -49,28 +182,44 @@
   var dateEl = $("[data-date]");
   var greetSub = $("[data-greeting-sub]");
 
-  function tokyoParts() {
+  function tokyoTime() {
     var fmt = new Intl.DateTimeFormat("en-GB", {
       timeZone: "Asia/Tokyo", hour12: false,
       hour: "2-digit", minute: "2-digit", second: "2-digit",
-      weekday: "long", day: "numeric", month: "long", year: "numeric",
     });
     var p = {};
     fmt.formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
     return p;
   }
+  function tokyoDateStr() {
+    var d = new Date();
+    if (lang === "ja") {
+      var fj = new Intl.DateTimeFormat("ja-JP", {
+        timeZone: "Asia/Tokyo", year: "numeric", month: "numeric", day: "numeric", weekday: "short",
+      });
+      var pj = {};
+      fj.formatToParts(d).forEach(function (x) { pj[x.type] = x.value; });
+      return pj.year + "年" + pj.month + "月" + pj.day + "日（" + pj.weekday + "）";
+    }
+    var fe = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Tokyo", weekday: "long", day: "numeric", month: "long", year: "numeric",
+    });
+    var pe = {};
+    fe.formatToParts(d).forEach(function (x) { pe[x.type] = x.value; });
+    return pe.weekday + ", " + pe.day + " " + pe.month + " " + pe.year;
+  }
   function tickClock() {
-    var p = tokyoParts();
-    clockEl.textContent = p.hour + ":" + p.minute + ":" + p.second;
-    dateEl.textContent = p.weekday + ", " + p.day + " " + p.month + " " + p.year;
-    var h = parseInt(p.hour, 10);
-    var sub, wave;
-    if (h < 5)       { sub = "Burning the midnight oil — be gentle with yourself."; wave = "🌙"; }
-    else if (h < 12) { sub = "Good morning — a fresh start awaits."; wave = "🌸"; }
-    else if (h < 17) { sub = "Good afternoon — let's make it count."; wave = "☀️"; }
-    else if (h < 21) { sub = "Good evening — ready to focus?"; wave = "🌷"; }
-    else             { sub = "Winding down — one more focused stretch?"; wave = "🌙"; }
-    greetSub.textContent = sub;
+    var t = tokyoTime();
+    clockEl.textContent = t.hour + ":" + t.minute + ":" + t.second;
+    dateEl.textContent = tokyoDateStr();
+    var h = parseInt(t.hour, 10);
+    var i, wave;
+    if (h < 5)       { i = 0; wave = "🌙"; }
+    else if (h < 12) { i = 1; wave = "🌸"; }
+    else if (h < 17) { i = 2; wave = "☀️"; }
+    else if (h < 21) { i = 3; wave = "🌷"; }
+    else             { i = 4; wave = "🌙"; }
+    greetSub.textContent = L().subs[i];
     $(".wave").textContent = wave;
   }
   tickClock();
@@ -91,8 +240,26 @@
     85:["Snow showers","🌨️"],86:["Snow showers","🌨️"],
     95:["Thunderstorm","⛈️"],96:["Thunderstorm","⛈️"],99:["Thunderstorm","⛈️"],
   };
-  function wmo(code) { return WMO[code] || ["—","🌡️"]; }
+  var WMO_JA = {
+    0: "快晴", 1: "おおむね晴れ", 2: "一部曇り", 3: "曇り",
+    45: "霧", 48: "霧氷",
+    51: "弱い霧雨", 53: "霧雨", 55: "強い霧雨",
+    56: "着氷性の霧雨", 57: "着氷性の霧雨",
+    61: "弱い雨", 63: "雨", 65: "強い雨",
+    66: "着氷性の雨", 67: "着氷性の雨",
+    71: "弱い雪", 73: "雪", 75: "強い雪", 77: "霧雪",
+    80: "弱いにわか雨", 81: "にわか雨", 82: "激しいにわか雨",
+    85: "にわか雪", 86: "にわか雪",
+    95: "雷雨", 96: "雷雨", 99: "雷雨",
+  };
+  function wmo(code) {
+    var e = WMO[code] || ["—", "🌡️"];
+    var name = lang === "ja" ? (WMO_JA[code] || "—") : e[0];
+    return [name, e[1]];
+  }
 
+  var lastWeather = null;
+  var weatherState = "loading"; // "loading" | "ok" | "error"
   function loadWeather() {
     var url = "https://api.open-meteo.com/v1/forecast?latitude=35.6762&longitude=139.6503" +
       "&current=temperature_2m,relative_humidity_2m,weather_code" +
@@ -100,26 +267,34 @@
       "&timezone=Asia%2FTokyo&forecast_days=4";
     fetch(url)
       .then(function (r) { if (!r.ok) throw new Error("net"); return r.json(); })
-      .then(renderWeather)
-      .catch(function () {
-        $("[data-cond]").textContent = "Weather unavailable right now.";
-        $("[data-weather-icon]").textContent = "🌡️";
-        $("[data-temp]").textContent = "—";
-      });
+      .then(function (d) { weatherState = "ok"; lastWeather = d; renderWeather(d); })
+      .catch(function () { weatherState = "error"; renderWeatherError(); });
+  }
+  function renderWeatherError() {
+    $("[data-cond]").textContent = L().weatherUnavailable;
+    $("[data-weather-icon]").textContent = "🌡️";
+    $("[data-temp]").textContent = "—";
+    $("[data-humidity]").textContent = "";
+    $("[data-forecast]").innerHTML = "";
+  }
+  function refreshWeatherText() {
+    if (weatherState === "ok" && lastWeather) renderWeather(lastWeather);
+    else if (weatherState === "error") renderWeatherError();
+    else $("[data-cond]").textContent = L().weatherLoading;
   }
   function renderWeather(d) {
     var c = d.current, info = wmo(c.weather_code);
     $("[data-weather-icon]").textContent = info[1];
     $("[data-temp]").textContent = Math.round(c.temperature_2m) + "°C";
     $("[data-cond]").textContent = info[0];
-    $("[data-humidity]").textContent = "Humidity " + c.relative_humidity_2m + "%";
+    $("[data-humidity]").textContent = L().humidityLabel + " " + c.relative_humidity_2m + "%";
 
     var fc = $("[data-forecast]");
     fc.innerHTML = "";
     var days = d.daily.time;
     for (var i = 1; i < days.length && i <= 3; i++) {
       var di = wmo(d.daily.weather_code[i]);
-      var name = new Date(days[i] + "T00:00:00").toLocaleDateString("en-US", {
+      var name = new Date(days[i] + "T00:00:00").toLocaleDateString(lang === "ja" ? "ja-JP" : "en-US", {
         weekday: "short", timeZone: "Asia/Tokyo",
       });
       var li = document.createElement("li");
@@ -176,9 +351,7 @@
 
     var open = state.todos.filter(function (t) { return !t.done; }).length;
     todoEmpty.style.display = state.todos.length ? "none" : "block";
-    todoCounter.textContent = state.todos.length
-      ? open + " left of " + state.todos.length
-      : "";
+    todoCounter.textContent = state.todos.length ? L().leftOf(open, state.todos.length) : "";
   }
 
   todoForm.addEventListener("submit", function (e) {
@@ -237,10 +410,12 @@
 
   function fmtDur(totalMin) {
     var h = Math.floor(totalMin / 60), m = Math.round(totalMin % 60);
+    if (lang === "ja") return (h ? h + "時間" : "") + m + "分";
     return (h ? h + "h " : "") + m + "m";
   }
   function fmtSecs(sec) {
     var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+    if (lang === "ja") { if (h) return h + "時間" + m + "分"; if (m) return m + "分"; return Math.floor(sec) + "秒"; }
     if (h) return h + "h " + m + "m";
     if (m) return m + "m";
     return Math.floor(sec) + "s";
@@ -253,14 +428,14 @@
       var div = document.createElement("div");
       div.className = "blk blk-" + p.type;
       div.style.flex = p.secs;
-      div.title = (p.type === "focus" ? "Focus " : "Break ") + Math.round(p.secs / 60) + " min";
+      div.title = (p.type === "focus" ? L().focus : L().breakLabel) + " " + Math.round(p.secs / 60) + (lang === "ja" ? "分" : " min");
       scheduleEl.appendChild(div);
     });
     var focusMin = s.cycles * s.focusLen;
     var breakMin = (s.cycles - 1) * s.breakLen;
-    scheduleSummary.textContent =
-      s.cycles + " × " + s.focusLen + "m focus + " + s.breakLen + "m breaks · " +
-      fmtDur(focusMin) + " studying, " + fmtDur(focusMin + breakMin) + " total.";
+    scheduleSummary.textContent = L().scheduleSummary(
+      s.cycles, s.focusLen, s.breakLen, fmtDur(focusMin), fmtDur(focusMin + breakMin)
+    );
   }
 
   function suggestPlan() {
@@ -332,8 +507,8 @@
 
     var isBreak = phase.type === "break";
     ringWrap.classList.toggle("break", isBreak);
-    phaseLabel.textContent = isBreak ? "Break" : "Focus";
-    cycleLabel.textContent = "Cycle " + currentFocusCycle() + " of " + s.cycles;
+    phaseLabel.textContent = isBreak ? L().breakLabel : L().focus;
+    cycleLabel.textContent = L().cycleOf(currentFocusCycle(), s.cycles);
     document.title = ringTime.textContent + " · " + phaseLabel.textContent + " — Hello, Rino!";
   }
 
@@ -443,8 +618,8 @@
   var progFill = $("[data-progress-fill]");
   var progPct = $("[data-progress-pct]");
   var progBar = $("[data-progress-bar]");
-  var studiedEl = $("[data-studied]");
-  var plannedEl = $("[data-planned]");
+  var studiedLineEl = $("[data-studied-line]");
+  var plannedLineEl = $("[data-planned-line]");
   var affirmEl = $("[data-affirm]");
   var PRING_LEN = 2 * Math.PI * 68;
   progFill.style.strokeDasharray = PRING_LEN;
@@ -457,16 +632,16 @@
     progFill.style.strokeDashoffset = PRING_LEN * (1 - pct / 100);
     progPct.textContent = Math.round(pct) + "%";
     progBar.style.width = pct + "%";
-    studiedEl.textContent = fmtSecs(studied);
-    plannedEl.textContent = fmtDur(planned / 60);
+    studiedLineEl.innerHTML = L().studiedLine(fmtSecs(studied));
+    plannedLineEl.innerHTML = L().plannedLine(fmtDur(planned / 60));
 
-    var msg;
-    if (pct === 0)        msg = "Let's begin whenever you're ready. 💜";
-    else if (pct < 34)    msg = "You're off to a lovely start. Keep going! 🌱";
-    else if (pct < 67)    msg = "Over a third done — you've got this. 🌿";
-    else if (pct < 100)   msg = "So close now — finish strong. 🌸";
-    else                  msg = "Goal reached — wonderful work today! 🎉💜";
-    affirmEl.textContent = msg;
+    var i;
+    if (pct === 0)      i = 0;
+    else if (pct < 34)  i = 1;
+    else if (pct < 67)  i = 2;
+    else if (pct < 100) i = 3;
+    else                i = 4;
+    affirmEl.textContent = L().affirms[i];
   }
 
   $("[data-reset-progress]").addEventListener("click", function () {
@@ -476,7 +651,7 @@
   });
 
   function celebrate() {
-    affirmEl.textContent = "Session complete — take a well-earned breath. 🎉";
+    affirmEl.textContent = L().sessionDone;
     // tiny burst of emoji petals
     var petals = ["🌸", "💜", "✨", "🌿", "🌷"];
     for (var i = 0; i < 18; i++) {
@@ -497,11 +672,20 @@
     }
   }
 
+  /* ---------- Language toggle ---------- */
+  $$("[data-lang-switch] button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var target = b.getAttribute("data-lang");
+      if (target !== lang) applyLang(target);
+    });
+  });
+
   /* ---------- Init ---------- */
   readSettings();
   renderSchedule();
   resetTimer();
   renderProgress();
+  applyLang(lang); // localize everything to the saved/default language
 
   // persist on leave
   window.addEventListener("beforeunload", saveNow);
@@ -575,14 +759,18 @@
     }
 
     function render() {
-      titleEl.textContent = MONTHS[shown.getMonth()] + " " + shown.getFullYear();
+      var ja = lang === "ja";
+      titleEl.textContent = ja
+        ? shown.getFullYear() + "年" + (shown.getMonth() + 1) + "月"
+        : MONTHS[shown.getMonth()] + " " + shown.getFullYear();
+      var dows = ja ? ["日", "月", "火", "水", "木", "金", "土"] : DOWS;
       var first = new Date(shown.getFullYear(), shown.getMonth(), 1);
       var gs = addD(sod(first), -first.getDay());
       var rs = gs, re = addD(gs, 42);
       var colors = dayColors(calData(), rs, re);
       var today = new Date();
       var html = "";
-      DOWS.forEach(function (d) { html += '<span class="dow">' + d + "</span>"; });
+      dows.forEach(function (d) { html += '<span class="dow">' + d + "</span>"; });
       for (var i = 0; i < 42; i++) {
         var day = addD(gs, i);
         var cls = "cc-day";
@@ -607,6 +795,7 @@
     });
     document.addEventListener("visibilitychange", function () { if (!document.hidden) render(); });
 
+    miniCalRender = render;
     render();
   })();
 })();

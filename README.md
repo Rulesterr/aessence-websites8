@@ -22,6 +22,9 @@ lilac theme for a focused, encouraging study experience.
   chime and a little celebration when you finish.
 - **Progress graph** — a ring + bar comparing time **studied** against your
   **planned** total, with encouraging affirmations along the way.
+- **Bilingual (EN / 日本語)** — a language switch in the greeting card localizes
+  the whole study page, including the Tokyo date and weather, and remembers your
+  choice in `localStorage`.
 - **Persistence** — to-dos, settings, and accumulated study time are saved to
   `localStorage`, so they survive refreshes and return visits.
 - **Accessible & comfortable** — keyboard-operable, AA-minded contrast,

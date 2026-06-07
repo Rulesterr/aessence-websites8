@@ -17,13 +17,17 @@
     <!-- ===== Header ===== -->
     <header class="hero">
       <div class="hero-greeting">
-        <h1>Hello, Rino! <span class="wave" aria-hidden="true">🌙</span></h1>
+        <div class="lang-switch" data-lang-switch role="group" aria-label="Language">
+          <button type="button" data-lang="en">EN</button>
+          <button type="button" data-lang="ja">日本語</button>
+        </div>
+        <h1><span data-i18n="greeting">Hello, Rino!</span> <span class="wave" aria-hidden="true">🌙</span></h1>
         <p class="subtitle" data-greeting-sub>Ready to focus?</p>
       </div>
 
       <section class="weather-card" data-weather aria-label="Tokyo time and weather">
         <div class="weather-time">
-          <span class="weather-loc">Tokyo, Japan</span>
+          <span class="weather-loc" data-i18n="tokyo">Tokyo, Japan</span>
           <span class="clock" data-clock>--:--:--</span>
           <span class="date" data-date>—</span>
         </div>
@@ -45,7 +49,7 @@
           <button type="button" data-cc-next aria-label="Next month">›</button>
         </div>
         <div class="cc-grid" data-cc-grid></div>
-        <a class="cc-open" href="calendar.html">Open full calendar →</a>
+        <a class="cc-open" href="calendar.html" data-i18n="openCal">Open full calendar →</a>
       </section>
     </header>
 
@@ -56,22 +60,22 @@
         <!-- To-do -->
         <section class="panel todo" aria-label="To-do list">
           <div class="panel-head">
-            <h2>Today's to-dos</h2>
+            <h2 data-i18n="todos">Today's to-dos</h2>
             <span class="counter" data-todo-counter></span>
           </div>
           <form class="todo-add" data-todo-form>
-            <input type="text" data-todo-input placeholder="What would you like to get done?" aria-label="New to-do" maxlength="120" />
-            <button type="submit" class="btn btn-soft" aria-label="Add to-do">Add</button>
+            <input type="text" data-todo-input data-i18n-ph="todoPlaceholder" placeholder="What would you like to get done?" aria-label="New to-do" maxlength="120" />
+            <button type="submit" class="btn btn-soft" aria-label="Add to-do" data-i18n="add">Add</button>
           </form>
           <ul class="todo-list" data-todo-list></ul>
-          <p class="empty-note" data-todo-empty>Nothing here yet — add your first task above. 🌿</p>
+          <p class="empty-note" data-todo-empty data-i18n="todoEmpty">Nothing here yet — add your first task above. 🌿</p>
         </section>
 
         <!-- Progress -->
         <section class="panel progress" aria-label="Study progress">
           <div class="panel-head">
-            <h2>Your progress</h2>
-            <button type="button" class="btn btn-ghost btn-tiny" data-reset-progress>Reset</button>
+            <h2 data-i18n="progressTitle">Your progress</h2>
+            <button type="button" class="btn btn-ghost btn-tiny" data-reset-progress data-i18n="reset">Reset</button>
           </div>
           <div class="progress-body">
             <div class="progress-ring-wrap">
@@ -84,8 +88,8 @@
               </div>
             </div>
             <div class="progress-stats">
-              <p class="progress-line"><strong data-studied>0m</strong> studied</p>
-              <p class="progress-line muted">of <strong data-planned>3h 0m</strong> planned</p>
+              <p class="progress-line" data-studied-line></p>
+              <p class="progress-line muted" data-planned-line></p>
               <div class="progress-bar"><span data-progress-bar></span></div>
               <p class="affirm" data-affirm>Let's begin whenever you're ready. 💜</p>
             </div>
@@ -96,19 +100,19 @@
       <!-- Right column: Pomodoro -->
       <section class="panel pomodoro" data-pomodoro aria-label="Pomodoro timer">
         <div class="panel-head">
-          <h2>Focus timer</h2>
-          <button type="button" class="btn btn-ghost btn-tiny" data-edit-plan hidden>Edit plan</button>
+          <h2 data-i18n="focusTimer">Focus timer</h2>
+          <button type="button" class="btn btn-ghost btn-tiny" data-edit-plan hidden data-i18n="editPlan">Edit plan</button>
         </div>
 
         <!-- Decide duration first (full-width, above the clock) -->
         <div class="pomo-duration" data-pomo-duration>
-          <label>Study for
+          <label><span data-i18n="studyFor">Study for</span>
             <span class="inline-inputs">
-              <input type="number" min="0" max="12" data-total-hours value="3" aria-label="Study hours" /> h
-              <input type="number" min="0" max="59" step="5" data-total-mins value="0" aria-label="Study minutes" /> m
+              <input type="number" min="0" max="12" data-total-hours value="3" aria-label="Study hours" /> <span data-i18n="hUnit">h</span>
+              <input type="number" min="0" max="59" step="5" data-total-mins value="0" aria-label="Study minutes" /> <span data-i18n="mUnit">m</span>
             </span>
           </label>
-          <button type="button" class="btn btn-soft" data-suggest>Enter</button>
+          <button type="button" class="btn btn-soft" data-suggest data-i18n="enter">Enter</button>
         </div>
 
         <!-- Timer -->
@@ -125,19 +129,19 @@
             </div>
           </div>
           <div class="timer-controls">
-            <button type="button" class="btn btn-primary" data-start>Start</button>
-            <button type="button" class="btn btn-soft" data-pause hidden>Pause</button>
-            <button type="button" class="btn btn-ghost" data-reset>Reset</button>
-            <button type="button" class="btn btn-ghost" data-skip>Skip</button>
+            <button type="button" class="btn btn-primary" data-start data-i18n="start">Start</button>
+            <button type="button" class="btn btn-soft" data-pause hidden data-i18n="pause">Pause</button>
+            <button type="button" class="btn btn-ghost" data-reset data-i18n="reset">Reset</button>
+            <button type="button" class="btn btn-ghost" data-skip data-i18n="skip">Skip</button>
           </div>
         </div>
 
         <!-- Setup (hidden once a session starts) -->
         <div class="pomo-setup" data-pomo-setup>
           <div class="setup-grid">
-            <label>Focus<input type="number" min="5" max="90" data-focus-len value="25" /></label>
-            <label>Break<input type="number" min="1" max="30" data-break-len value="5" /></label>
-            <label>Cycles<input type="number" min="1" max="20" data-cycles value="3" /></label>
+            <label><span data-i18n="focus">Focus</span><input type="number" min="5" max="90" data-focus-len value="25" /></label>
+            <label><span data-i18n="breakLabel">Break</span><input type="number" min="1" max="30" data-break-len value="5" /></label>
+            <label><span data-i18n="cyclesLabel">Cycles</span><input type="number" min="1" max="20" data-cycles value="3" /></label>
           </div>
 
           <div class="schedule" data-schedule aria-label="Session schedule"></div>
@@ -147,7 +151,7 @@
     </div><!-- /.dash-grid -->
 
     <footer class="foot">
-      <p>Made with care for focused study · <span data-year></span></p>
+      <p><span data-i18n="footer">Made with care for focused study</span> · <span data-year></span></p>
     </footer>
   </main>
 

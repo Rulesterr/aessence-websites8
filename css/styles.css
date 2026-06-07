@@ -135,6 +135,7 @@ h1, h2, h3 {
 
 /* Frosted-glass greeting card filling the rest of the first row */
 .hero-greeting {
+  position: relative;
   align-self: stretch;
   display: flex;
   flex-direction: column;
@@ -148,6 +149,33 @@ h1, h2, h3 {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
+
+/* Language switch (EN / 日本語) */
+.lang-switch {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.9rem;
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.lang-switch button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+.lang-switch button:hover { color: var(--lilac-deeper); }
+.lang-switch button.active { background: var(--lilac-deep); color: #fff; }
 
 /* When space is tight, drop the cards under a full-width greeting */
 @media (max-width: 1080px) {
