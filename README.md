@@ -36,7 +36,8 @@ A self-contained, Apple-Calendar-style calendar lives at **`calendar.html`**.
 The study page's header shows a **mini-month card** next to the Tokyo card
 (today highlighted, dots on days with events); clicking a day opens the full
 calendar on that date via a `#YYYY-MM-DD` hash. No external API or backend —
-everything is stored in `localStorage`.
+everything is stored in `localStorage`. The calendar is also **bilingual
+(EN / 日本語)** and shares the language preference with the study page.
 
 - **Month / Week / Day** views with a view switcher and Today / prev / next nav.
 - **Create, edit, and delete events** via a dialog — title, all-day or timed,

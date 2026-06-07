@@ -21,6 +21,8 @@
   flex-direction: column;
   gap: 1rem;
 }
+.cal-side-top { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.cal-side-top .lang-switch { position: static; }
 .cal-back { font-weight: 600; font-size: 0.9rem; color: var(--lilac-deeper); }
 .cal-brand { font-size: 1.7rem; }
 

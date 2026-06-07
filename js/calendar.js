@@ -12,14 +12,55 @@
 
   var PALETTE = ["#8c6fd1", "#6cb3a0", "#e06c9f", "#6c9fe0", "#e0a96c", "#7bbf6a", "#c77dd6", "#e0556f"];
 
+  /* ============================================================
+     i18n — English / Japanese (shares "rino.lang" with the study page)
+     ============================================================ */
+  var LANG_STORE = "rino.lang";
+  var lang = (function () {
+    try { return localStorage.getItem(LANG_STORE) === "ja" ? "ja" : "en"; } catch (e) { return "en"; }
+  })();
+  var DICT = {
+    en: {
+      study: "← Study", calendar: "Calendar", myCalendars: "My Calendars",
+      today: "Today", searchPh: "Search events", day: "Day", week: "Week", month: "Month",
+      newEvent: "+ New Event", event: "Event", newEventTitle: "New event", editEvent: "Edit event",
+      titlePh: "Title", allDay: "All-day", starts: "Starts", ends: "Ends", repeat: "Repeat",
+      repNever: "Never", repDaily: "Every day", repWeekly: "Every week", repMonthly: "Every month", repYearly: "Every year",
+      locationPh: "Location", notesPh: "Notes", del: "Delete", cancel: "Cancel", save: "Save",
+      allday: "all-day", untitled: "Untitled", noEvents: "No events found",
+      errTitle: "Please add a title.", errEnd: "End time must be after the start.",
+      confirmDelCal: function (n) { return 'Delete "' + n + '" and its events?'; },
+      confirmDelEvent: "Delete this event?", promptCal: "New calendar name:",
+      more: function (n) { return "+" + n + " more"; },
+      dowShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      defaults: { personal: "Personal", study: "Study", exams: "Exams" },
+    },
+    ja: {
+      study: "← 勉強", calendar: "カレンダー", myCalendars: "マイカレンダー",
+      today: "今日", searchPh: "予定を検索", day: "日", week: "週", month: "月",
+      newEvent: "＋ 新しい予定", event: "予定", newEventTitle: "新しい予定", editEvent: "予定を編集",
+      titlePh: "タイトル", allDay: "終日", starts: "開始", ends: "終了", repeat: "繰り返し",
+      repNever: "なし", repDaily: "毎日", repWeekly: "毎週", repMonthly: "毎月", repYearly: "毎年",
+      locationPh: "場所", notesPh: "メモ", del: "削除", cancel: "キャンセル", save: "保存",
+      allday: "終日", untitled: "無題", noEvents: "予定が見つかりません",
+      errTitle: "タイトルを入力してください。", errEnd: "終了は開始より後にしてください。",
+      confirmDelCal: function (n) { return "「" + n + "」とその予定を削除しますか？"; },
+      confirmDelEvent: "この予定を削除しますか？", promptCal: "新しいカレンダー名：",
+      more: function (n) { return "他" + n + "件"; },
+      dowShort: ["日", "月", "火", "水", "木", "金", "土"],
+      defaults: { personal: "個人", study: "勉強", exams: "試験" },
+    },
+  };
+  function L() { return DICT[lang]; }
+
   /* ---------- State ---------- */
   var state = load();
   function load() {
     var def = {
       calendars: [
-        { id: "personal", name: "Personal", color: "#8c6fd1" },
-        { id: "study", name: "Study", color: "#6cb3a0" },
-        { id: "exams", name: "Exams", color: "#e06c9f" },
+        { id: "personal", name: L().defaults.personal, color: "#8c6fd1" },
+        { id: "study", name: L().defaults.study, color: "#6cb3a0" },
+        { id: "exams", name: L().defaults.exams, color: "#e06c9f" },
       ],
       events: [],
       hidden: [],
@@ -61,8 +102,30 @@
   var DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   var MON = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+  // Localized labels & titles
+  function dowName(i) { return L().dowShort[i]; }
+  function monthTitle(d) {
+    return lang === "ja" ? d.getFullYear() + "年" + (d.getMonth() + 1) + "月" : MON[d.getMonth()] + " " + d.getFullYear();
+  }
+  function dayTitle(d) {
+    if (lang === "ja") return d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日（" + L().dowShort[d.getDay()] + "）";
+    return DOW[d.getDay()] + ", " + MON[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+  }
+  function weekTitle(base) {
+    var end = addDays(base, 6);
+    if (lang === "ja") return base.getFullYear() + "年" + (base.getMonth() + 1) + "月" + base.getDate() + "日 – " + (end.getMonth() + 1) + "月" + end.getDate() + "日";
+    return MON[base.getMonth()].slice(0, 3) + " " + base.getDate() + " – " + MON[end.getMonth()].slice(0, 3) + " " + end.getDate() + ", " + end.getFullYear();
+  }
+  function miniTitle(d) {
+    return lang === "ja" ? d.getFullYear() + "年" + (d.getMonth() + 1) + "月" : MON[d.getMonth()].slice(0, 3) + " " + d.getFullYear();
+  }
+  function searchDate(d) {
+    return lang === "ja" ? (d.getMonth() + 1) + "月" + d.getDate() + "日" : MON[d.getMonth()].slice(0, 3) + " " + d.getDate();
+  }
+
   function fmtTime(d) {
     var h = d.getHours(), m = d.getMinutes();
+    if (lang === "ja") return h + ":" + (m < 10 ? "0" + m : m);
     var ap = h < 12 ? "AM" : "PM";
     var hr = h % 12; if (hr === 0) hr = 12;
     return hr + (m ? ":" + (m < 10 ? "0" + m : m) : "") + " " + ap;
@@ -130,7 +193,7 @@
 
   /* ---------- Month ---------- */
   function renderMonth() {
-    titleEl.textContent = MON[cursor.getMonth()] + " " + cursor.getFullYear();
+    titleEl.textContent = monthTitle(cursor);
     var first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
     var gridStart = startOfWeek(first);
     var weeks = 6;
@@ -138,7 +201,7 @@
     var occ = occurrencesInRange(rs, re);
 
     var html = '<div class="month"><div class="month-dow">';
-    DOW.forEach(function (d) { html += "<span>" + d + "</span>"; });
+    L().dowShort.forEach(function (d) { html += "<span>" + d + "</span>"; });
     html += '</div><div class="month-grid">';
 
     for (var i = 0; i < weeks * 7; i++) {
@@ -161,16 +224,16 @@
         var col = colorOf(o.ev.calendarId);
         if (o.ev.allDay) {
           html += '<div class="chip allday" data-evt="' + o.ev.id + '" style="background:' + col + '">' +
-            '<span class="ct">' + esc(o.ev.title || "Untitled") + "</span></div>";
+            '<span class="ct">' + esc(o.ev.title || L().untitled) + "</span></div>";
         } else {
           html += '<div class="chip timed" data-evt="' + o.ev.id + '">' +
             '<span class="cdot" style="background:' + col + '"></span>' +
             '<span class="ctime">' + fmtTime(o.start) + "</span>" +
-            '<span class="ct">' + esc(o.ev.title || "Untitled") + "</span></div>";
+            '<span class="ct">' + esc(o.ev.title || L().untitled) + "</span></div>";
         }
       });
       if (dayOcc.length > 3) {
-        html += '<div class="m-more" data-goday="' + day.getTime() + '">+' + (dayOcc.length - 3) + " more</div>";
+        html += '<div class="m-more" data-goday="' + day.getTime() + '">' + L().more(dayOcc.length - 3) + "</div>";
       }
       html += "</div>";
     }
@@ -185,13 +248,7 @@
     var rs = base, re = addDays(base, numDays);
     var occ = occurrencesInRange(rs, re);
 
-    if (numDays === 7) {
-      var endLbl = addDays(base, 6);
-      titleEl.textContent = MON[base.getMonth()].slice(0, 3) + " " + base.getDate() +
-        " – " + MON[endLbl.getMonth()].slice(0, 3) + " " + endLbl.getDate() + ", " + endLbl.getFullYear();
-    } else {
-      titleEl.textContent = DOW[base.getDay()] + ", " + MON[base.getMonth()] + " " + base.getDate() + ", " + base.getFullYear();
-    }
+    titleEl.textContent = numDays === 7 ? weekTitle(base) : dayTitle(base);
 
     var cols = "60px repeat(" + numDays + ", 1fr)";
 
@@ -200,20 +257,20 @@
     for (var d = 0; d < numDays; d++) {
       var day = addDays(base, d);
       head += '<div class="dcol' + (isToday(day) ? " today" : "") + '">' +
-        '<div class="dow">' + DOW[day.getDay()] + "</div>" +
+        '<div class="dow">' + dowName(day.getDay()) + "</div>" +
         '<div class="dnum">' + day.getDate() + "</div></div>";
     }
     head += "</div>";
 
     // all-day band
-    var ad = '<div class="tg-allday" style="grid-template-columns:' + cols + '"><div class="gutter">all-day</div>';
+    var ad = '<div class="tg-allday" style="grid-template-columns:' + cols + '"><div class="gutter">' + L().allday + "</div>";
     for (var d2 = 0; d2 < numDays; d2++) {
       var day2 = addDays(base, d2), day2e = addDays(day2, 1);
       ad += '<div class="ad-col" data-day="' + day2.getTime() + '">';
       occ.filter(function (o) { return o.ev.allDay && o.start < day2e && o.end > day2; })
         .forEach(function (o) {
           ad += '<div class="chip allday" data-evt="' + o.ev.id + '" style="background:' + colorOf(o.ev.calendarId) + '">' +
-            '<span class="ct">' + esc(o.ev.title || "Untitled") + "</span></div>";
+            '<span class="ct">' + esc(o.ev.title || L().untitled) + "</span></div>";
         });
       ad += "</div>";
     }
@@ -245,7 +302,7 @@
         var leftPct = it.col * widthPct;
         body += '<div class="tg-event" data-evt="' + it.o.ev.id + '" style="top:' + top + "px;height:" + height +
           "px;left:calc(" + leftPct + "% + 2px);width:calc(" + widthPct + "% - 4px);background:" + colorOf(it.o.ev.calendarId) + '">' +
-          '<div class="te-title">' + esc(it.o.ev.title || "Untitled") + "</div>" +
+          '<div class="te-title">' + esc(it.o.ev.title || L().untitled) + "</div>" +
           '<div class="te-time">' + fmtTime(it.o.start) + "</div></div>";
       });
 
@@ -270,6 +327,7 @@
   }
 
   function hourLabel(h) {
+    if (lang === "ja") return h + "時";
     var ap = h < 12 ? "AM" : "PM"; var hr = h % 12; if (hr === 0) hr = 12;
     return hr + " " + ap;
   }
@@ -317,9 +375,9 @@
     var first = new Date(mc.getFullYear(), mc.getMonth(), 1);
     var gs = startOfWeek(first);
     var html = '<div class="mini-head"><button data-mini-prev aria-label="Previous month">‹</button>' +
-      "<strong>" + MON[mc.getMonth()].slice(0, 3) + " " + mc.getFullYear() + "</strong>" +
+      "<strong>" + miniTitle(mc) + "</strong>" +
       '<button data-mini-next aria-label="Next month">›</button></div><div class="mini-grid">';
-    DOW.forEach(function (d) { html += '<span class="dow">' + d[0] + "</span>"; });
+    L().dowShort.forEach(function (d) { html += '<span class="dow">' + (lang === "ja" ? d : d[0]) + "</span>"; });
     for (var i = 0; i < 42; i++) {
       var day = addDays(gs, i);
       var cls = "day";
@@ -345,7 +403,7 @@
         (state.calendars.length > 1 ? '<button class="del" aria-label="Delete calendar" title="Delete calendar">×</button>' : "");
       li.addEventListener("click", function (e) {
         if (e.target.classList.contains("del")) {
-          if (confirm('Delete "' + c.name + '" and its events?')) {
+          if (confirm(L().confirmDelCal(c.name))) {
             state.events = state.events.filter(function (ev) { return ev.calendarId !== c.id; });
             state.calendars = state.calendars.filter(function (x) { return x.id !== c.id; });
             state.hidden = state.hidden.filter(function (x) { return x !== c.id; });
@@ -396,7 +454,7 @@
   function openEditor(ev, defaultDate) {
     F.err.textContent = "";
     if (ev) {
-      $("#evt-title-label").textContent = "Edit event";
+      $("#evt-title-label").textContent = L().editEvent;
       F.id.value = ev.id;
       F.title.value = ev.title || "";
       F.allday.checked = !!ev.allDay;
@@ -409,7 +467,7 @@
       F.notes.value = ev.notes || "";
       F.del.hidden = false;
     } else {
-      $("#evt-title-label").textContent = "New event";
+      $("#evt-title-label").textContent = L().newEventTitle;
       F.id.value = "";
       F.title.value = "";
       F.allday.checked = false;
@@ -435,14 +493,14 @@
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var title = F.title.value.trim();
-    if (!title) { F.err.textContent = "Please add a title."; return; }
+    if (!title) { F.err.textContent = L().errTitle; return; }
     var allDay = F.allday.checked;
     var start = allDay ? fromInputs(F.sd.value, "00:00") : fromInputs(F.sd.value, F.st.value);
     var end = allDay ? fromInputs(F.ed.value, "00:00") : fromInputs(F.ed.value, F.et.value);
     if (allDay) end = addDays(startOfDay(end), 1); // make end-of-day inclusive
     if (end <= start) {
       if (allDay) end = addDays(start, 1);
-      else { F.err.textContent = "End time must be after the start."; return; }
+      else { F.err.textContent = L().errEnd; return; }
     }
     var rec = {
       calendarId: F.cal.value, title: title, allDay: allDay,
@@ -461,7 +519,7 @@
 
   F.del.addEventListener("click", function () {
     if (!F.id.value) return;
-    if (confirm("Delete this event?")) {
+    if (confirm(L().confirmDelEvent)) {
       state.events = state.events.filter(function (x) { return x.id !== F.id.value; });
       save(); closeEditor(); render();
     }
@@ -533,7 +591,7 @@
 
   // add calendar
   $("[data-add-calendar]").addEventListener("click", function () {
-    var name = prompt("New calendar name:");
+    var name = prompt(L().promptCal);
     if (!name) return;
     name = name.trim(); if (!name) return;
     var color = PALETTE[state.calendars.length % PALETTE.length];
@@ -559,13 +617,13 @@
         (ev.notes || "").toLowerCase().indexOf(q) !== -1;
     }).slice(0, 12);
     if (!matches.length) {
-      results.innerHTML = '<li class="none">No events found</li>';
+      results.innerHTML = '<li class="none">' + L().noEvents + "</li>";
     } else {
       results.innerHTML = matches.map(function (ev) {
         var d = new Date(ev.start);
         return '<li data-result="' + ev.id + '"><span class="s-dot" style="background:' + colorOf(ev.calendarId) + '"></span>' +
-          '<span>' + esc(ev.title || "Untitled") + "</span>" +
-          '<span class="s-date">' + MON[d.getMonth()].slice(0, 3) + " " + d.getDate() + "</span></li>";
+          '<span>' + esc(ev.title || L().untitled) + "</span>" +
+          '<span class="s-date">' + searchDate(d) + "</span></li>";
       }).join("");
     }
     results.hidden = false;
@@ -586,6 +644,38 @@
     if (!e.target.closest(".search-wrap")) results.hidden = true;
   });
 
+  /* ---------- i18n apply + language toggle ---------- */
+  function applyStaticI18n() {
+    var d = L();
+    $$("[data-i18n]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n");
+      if (typeof d[k] === "string") el.textContent = d[k];
+    });
+    $$("[data-i18n-ph]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n-ph");
+      if (typeof d[k] === "string") el.placeholder = d[k];
+    });
+  }
+  function updateLangToggle() {
+    $$("[data-lang-switch] button").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-lang") === lang);
+    });
+  }
+  function applyLang(newLang) {
+    lang = newLang === "ja" ? "ja" : "en";
+    try { localStorage.setItem(LANG_STORE, lang); } catch (e) {}
+    document.documentElement.lang = lang;
+    applyStaticI18n();
+    updateLangToggle();
+    render();
+  }
+  $$("[data-lang-switch] button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var target = b.getAttribute("data-lang");
+      if (target !== lang) applyLang(target);
+    });
+  });
+
   /* ---------- Init ---------- */
   // Honor a #YYYY-MM-DD hash (e.g. from the home page mini calendar):
   // jump straight to that day.
@@ -597,6 +687,9 @@
     view = "day";
   })();
 
+  applyStaticI18n();
+  updateLangToggle();
+  document.documentElement.lang = lang;
   render();
   // keep the "now" line and today highlight fresh
   setInterval(function () { if (view !== "month") render(); }, 60000);
