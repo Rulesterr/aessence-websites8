@@ -562,53 +562,76 @@
   }
 
   function advance() {
-    chimePlay();
     if (idx >= phases.length - 1) {
       // session complete
       remaining = 0;
       paint();
       stop();
       setEditing(false);
+      playSeq(SND.complete);
       celebrate();
       idx = phases.length; // mark finished
       return;
     }
     idx++;
     remaining = phases[idx].secs;
+    announcePhase(); // chime for the phase we just entered (break / focus)
     paint();
   }
 
-  // Gentle two-note chime via Web Audio (no asset needed)
+  /* ---------- Sound (Web Audio, no assets needed) ----------
+     The AudioContext is unlocked on the Start click (a user gesture);
+     phase-change chimes during the running timer then play reliably. */
   var audioCtx = null;
-  function chimePlay() {
+  function audioReady() {
     try {
       var AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
+      if (!AC) return null;
       if (!audioCtx) audioCtx = new AC();
       if (audioCtx.state === "suspended") audioCtx.resume();
-      [880, 1174.66].forEach(function (freq, i) {
-        var osc = audioCtx.createOscillator();
-        var gain = audioCtx.createGain();
-        var t = audioCtx.currentTime + i * 0.18;
-        osc.type = "sine";
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.18, t + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
-        osc.connect(gain).connect(audioCtx.destination);
-        osc.start(t);
-        osc.stop(t + 0.62);
-      });
-    } catch (e) { /* audio not available */ }
+      return audioCtx;
+    } catch (e) { return null; }
+  }
+  // notes: array of { f: freq, t: startOffset, d: duration, g: gain, type }
+  function playSeq(notes) {
+    var ctx = audioReady();
+    if (!ctx) return;
+    notes.forEach(function (n) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      var t0 = ctx.currentTime + (n.t || 0);
+      var dur = n.d || 0.45;
+      var peak = n.g || 0.16;
+      osc.type = n.type || "sine";
+      osc.frequency.value = n.f;
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(peak, t0 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t0);
+      osc.stop(t0 + dur + 0.03);
+    });
+  }
+  var SND = {
+    start:      [{ f: 587.33, d: 0.12 }, { f: 880.00, t: 0.09, d: 0.16 }],                 // quick rising blip
+    breakStart: [{ f: 880.00, d: 0.40 }, { f: 587.33, t: 0.20, d: 0.55 }],                 // descending → relax
+    focusStart: [{ f: 587.33, d: 0.30 }, { f: 880.00, t: 0.17, d: 0.48 }],                 // rising → back to work
+    complete:   [{ f: 523.25, d: 0.30 }, { f: 659.25, t: 0.16, d: 0.32 },
+                 { f: 783.99, t: 0.32, d: 0.34 }, { f: 1046.50, t: 0.48, d: 0.55 }],       // celebratory arpeggio
+  };
+  // Chime for the phase the timer just entered: break starting vs. break ending (focus).
+  function announcePhase() {
+    if (!phases.length || idx >= phases.length) return;
+    playSeq(phases[idx].type === "break" ? SND.breakStart : SND.focusStart);
   }
 
-  startBtn.addEventListener("click", start);
+  startBtn.addEventListener("click", function () { playSeq(SND.start); start(); });
   pauseBtn.addEventListener("click", stop);
   $("[data-reset]").addEventListener("click", function () { readSettings(); resetTimer(); });
   editPlanBtn.addEventListener("click", function () { resetTimer(); });
   $("[data-skip]").addEventListener("click", function () {
     if (!phases.length) resetTimer();
-    if (idx < phases.length - 1) { idx++; remaining = phases[idx].secs; paint(); }
+    if (idx < phases.length - 1) { idx++; remaining = phases[idx].secs; announcePhase(); paint(); }
     else { resetTimer(); }
   });
 
